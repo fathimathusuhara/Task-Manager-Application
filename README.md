@@ -4,24 +4,24 @@ TeamTask is a project management application designed for teams that value aesth
 
 ##  Key Features
 
-- ** Interactive Dashboard**: A vibrant, data-driven overview of your active tasks, overdue items, and project invitations.
-- ** Enterprise RBAC**: Role-Based Access Control (Admin vs. Member) ensuring secure project management and data integrity.
-- ** Premium Aesthetics**: A "stunning" Dark Blue theme featuring high-end glassmorphism, smooth micro-animations, and a responsive layout.
-- ** Real-time Collaboration**: Manage projects, assign tasks, and handle team invitations with an intuitive UI.
+- Interactive Dashboard: A vibrant, data-driven overview of your active tasks, overdue items, and project invitations.
+- Enterprise RBAC: Role-Based Access Control (Admin vs. Member) ensuring secure project management and data integrity.
+- Premium Aesthetics: A "stunning" Dark Blue theme featuring high-end glassmorphism, smooth micro-animations, and a responsive layout.
+- Real-time Collaboration: Manage projects, assign tasks, and handle team invitations with an intuitive UI.
 
 ##  Tech Stack
 
 ### Backend
-- **Framework**: FastAPI (Python)
-- **Database**: PostgreSQL (Production) / SQLite (Development)
-- **ORM**: SQLAlchemy
-- **Security**: JWT Authentication, Passlib (Bcrypt)
+- Framework: FastAPI (Python)
+- Database: PostgreSQL (Production) / SQLite (Development)
+- ORM: SQLAlchemy
+- Security: JWT Authentication, Passlib (Bcrypt)
 
 ### Frontend
-- **Framework**: React (Vite)
-- **Styling**: Vanilla CSS (Modern CSS Variables & Glassmorphism)
-- **Icons**: Lucide React
-- **Routing**: React Router v7
+- Framework: React (Vite)
+- Styling: Vanilla CSS (Modern CSS Variables & Glassmorphism)
+- Icons: Lucide React
+- Routing: React Router v7
 
 ##  Quick Start
 
