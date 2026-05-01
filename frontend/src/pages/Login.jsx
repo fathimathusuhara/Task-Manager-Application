@@ -16,7 +16,17 @@ const Login = () => {
       await login(username, password);
       navigate('/');
     } catch (err) {
-      setError('Invalid username or password');
+      if (err.response) {
+        if (err.response.status === 401) {
+          setError('Invalid username or password');
+        } else {
+          setError(`Server error: ${err.response.data?.detail || 'Unknown error'}`);
+        }
+      } else if (err.request) {
+        setError('No response from server. Please check your connection.');
+      } else {
+        setError('An error occurred during login.');
+      }
     }
   };
 

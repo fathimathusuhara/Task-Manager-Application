@@ -22,5 +22,5 @@ COPY backend/ ./
 # Copy built frontend from Stage 1
 COPY --from=frontend-builder /app/frontend/dist ./static
 
-# Run migrations and start the server
-CMD ["sh", "-c", "uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Run initialization and start the server
+CMD ["sh", "-c", "python init_db.py && uvicorn main:app --host 0.0.0.0 --port ${PORT:-8000}"]
