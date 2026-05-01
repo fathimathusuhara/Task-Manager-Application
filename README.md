@@ -1,4 +1,4 @@
-# TeamTask: Premium AI-Powered Project Management
+# TeamTask: Project Management
 
 TeamTask is a project management application designed for teams that value aesthetics, speed, and intelligence. It combines a robust FastAPI backend with a blazing-fast React frontend to provide a seamless collaboration experience.
 
