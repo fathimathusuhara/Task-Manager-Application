@@ -3,7 +3,6 @@ from sqlalchemy.orm import Session
 import models, schemas, auth
 from database import get_db
 from typing import List, Optional
-import ml_model
 
 router = APIRouter(
     prefix="/api/tasks",
@@ -113,27 +112,3 @@ def create_comment(task_id: int, comment: schemas.CommentCreate, db: Session = D
     db.commit()
     db.refresh(db_comment)
     return db_comment
-
-@router.get("/{task_id}/predict-delay")
-def predict_delay(task_id: int, db: Session = Depends(get_db), current_user: models.User = Depends(auth.get_current_active_user)):
-    task = db.query(models.Task).filter(models.Task.id == task_id).first()
-    if not task:
-        raise HTTPException(status_code=404, detail="Task not found")
-        
-    desc_len = len(task.description) if task.description else 0
-    
-    # Calculate user stats
-    concurrent_tasks = 0
-    completion_rate = 1.0
-    
-    if task.assignee_id:
-        assignee_tasks = db.query(models.Task).filter(models.Task.assignee_id == task.assignee_id).all()
-        concurrent_tasks = sum(1 for t in assignee_tasks if t.status != "Done" and t.id != task.id)
-        
-        total_assigned = len(assignee_tasks)
-        if total_assigned > 0:
-            completed = sum(1 for t in assignee_tasks if t.status == "Done")
-            completion_rate = completed / total_assigned
-            
-    prob = ml_model.predict_delay_probability(desc_len, concurrent_tasks, completion_rate)
-    return {"probability_of_delay": prob}

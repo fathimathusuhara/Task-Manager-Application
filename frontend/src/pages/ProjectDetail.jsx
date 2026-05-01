@@ -2,11 +2,11 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import api from '../api';
 import { AuthContext } from '../context/AuthContext';
-import { Plus, UserPlus, MessageSquare, Clock, Trash2, X, Activity, Settings } from 'lucide-react';
+import { Plus, UserPlus, MessageSquare, Clock, Trash2, X, Settings } from 'lucide-react';
 import { DndContext, useDraggable, useDroppable, closestCenter, PointerSensor, useSensor, useSensors } from '@dnd-kit/core';
 
 // --- DnD Components ---
-const DraggableTask = ({ task, onClick, isAdmin, onDelete, getRiskColor }) => {
+const DraggableTask = ({ task, onClick, isAdmin, onDelete }) => {
   const { attributes, listeners, setNodeRef, transform, isDragging } = useDraggable({
     id: `task-${task.id}`,
     data: task
@@ -43,11 +43,6 @@ const DraggableTask = ({ task, onClick, isAdmin, onDelete, getRiskColor }) => {
       <div className="flex justify-between items-center mt-4">
         <div className="flex items-center gap-3 text-xs text-muted">
            <span className="flex items-center gap-1"><MessageSquare size={14} /> {task.comments?.length || 0}</span>
-           {task.risk !== undefined && (
-             <span style={{ color: getRiskColor(task.risk), display: 'flex', alignItems: 'center', gap: '4px', fontWeight: 'bold' }}>
-               <Activity size={14} /> {Math.round(task.risk * 100)}% Risk
-             </span>
-           )}
         </div>
         <button 
           onPointerDown={(e) => { e.stopPropagation(); onClick(task); }} 
@@ -61,7 +56,7 @@ const DraggableTask = ({ task, onClick, isAdmin, onDelete, getRiskColor }) => {
   );
 };
 
-const DroppableColumn = ({ status, tasks, onTaskClick, isAdmin, onDelete, getRiskColor }) => {
+const DroppableColumn = ({ status, tasks, onTaskClick, isAdmin, onDelete }) => {
   const { isOver, setNodeRef } = useDroppable({
     id: `col-${status}`,
     data: { status }
@@ -86,7 +81,7 @@ const DroppableColumn = ({ status, tasks, onTaskClick, isAdmin, onDelete, getRis
       </h3>
       <div className="flex flex-col">
         {tasks.map(task => (
-          <DraggableTask key={task.id} task={task} onClick={onTaskClick} isAdmin={isAdmin} onDelete={onDelete} getRiskColor={getRiskColor} />
+          <DraggableTask key={task.id} task={task} onClick={onTaskClick} isAdmin={isAdmin} onDelete={onDelete} />
         ))}
         {tasks.length === 0 && (
            <div className="text-center text-muted text-sm" style={{ padding: '2rem 0' }}>Drop tasks here</div>
@@ -136,21 +131,7 @@ const ProjectDetail = () => {
       setProject(projRes.data);
       setEditProjectData({ name: projRes.data.name, description: projRes.data.description });
       
-      // Fetch ML Risk Predictions for each task
-      const tasksWithRisk = await Promise.all(
-        tasksRes.data.map(async (t) => {
-          if (t.status !== 'Done') {
-            try {
-              const riskRes = await api.get(`/tasks/${t.id}/predict-delay`);
-              return { ...t, risk: riskRes.data.probability_of_delay };
-            } catch {
-              return t;
-            }
-          }
-          return t;
-        })
-      );
-      setTasks(tasksWithRisk);
+      setTasks(tasksRes.data);
       
       if (user?.role === 'admin') {
         const usersRes = await api.get('/users/');
@@ -163,11 +144,6 @@ const ProjectDetail = () => {
     }
   };
 
-  const getRiskColor = (prob) => {
-    if (prob > 0.7) return 'var(--danger)';
-    if (prob > 0.4) return 'var(--warning, #f59e0b)';
-    return 'var(--success)';
-  };
 
   const handleDragEnd = async (event) => {
     const { active, over } = event;
@@ -315,7 +291,6 @@ const ProjectDetail = () => {
               onTaskClick={(task) => setSelectedTask(task)}
               isAdmin={isAdmin}
               onDelete={handleDeleteTask}
-              getRiskColor={getRiskColor}
             />
           ))}
         </div>

@@ -4,7 +4,6 @@ TeamTask is a high-performance, modern project management application designed f
 
 ## ✨ Key Features
 
-- **🧠 AI Task Delay Prediction**: Uses a built-in Machine Learning model (Logistic Regression) to analyze task complexity and team workload, predicting the probability of task delays before they happen.
 - **📊 Interactive Dashboard**: A vibrant, data-driven overview of your active tasks, overdue items, and project invitations.
 - **🛡️ Enterprise RBAC**: Role-Based Access Control (Admin vs. Member) ensuring secure project management and data integrity.
 - **🎨 Premium Aesthetics**: A "stunning" Dark Blue theme featuring high-end glassmorphism, smooth micro-animations, and a responsive layout.
@@ -16,7 +15,6 @@ TeamTask is a high-performance, modern project management application designed f
 - **Framework**: FastAPI (Python)
 - **Database**: PostgreSQL (Production) / SQLite (Development)
 - **ORM**: SQLAlchemy
-- **AI/ML**: Scikit-Learn, Pandas, Joblib
 - **Security**: JWT Authentication, Passlib (Bcrypt)
 
 ### Frontend
