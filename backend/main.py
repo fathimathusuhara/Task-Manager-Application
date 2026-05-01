@@ -40,35 +40,39 @@ os.makedirs(uploads_path, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
 
 # Mount static files (React Frontend built files)
-# Get the absolute path to the static folder
 base_path = os.path.dirname(os.path.abspath(__file__))
 frontend_path = os.path.join(base_path, "static")
+
+# Debugging paths (will show in Railway logs)
+print(f"DEBUG: Base path: {base_path}")
+print(f"DEBUG: Frontend path: {frontend_path}")
+print(f"DEBUG: Index exists: {os.path.exists(os.path.join(frontend_path, 'index.html'))}")
 
 @app.get("/api/health")
 def health_check():
     return {"status": "ok"}
 
-# Mount uploads (high priority)
+# Mount uploads
 uploads_path = os.path.join(base_path, "uploads")
 os.makedirs(uploads_path, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
 
-# Mount assets specifically for JS/CSS
+# Catch-all for assets (JS/CSS)
 assets_path = os.path.join(frontend_path, "assets")
 if os.path.exists(assets_path):
     app.mount("/assets", StaticFiles(directory=assets_path), name="assets")
 
-# Catch-all route for React Router (MUST be after API routes)
+# Catch-all route for React Router
 @app.get("/{full_path:path}")
 async def serve_react_app(full_path: str):
-    # If the path exists as a physical file, serve it (e.g. favicon, images)
+    # Try serving as a file first
     file_path = os.path.join(frontend_path, full_path)
     if os.path.isfile(file_path):
         return FileResponse(file_path)
     
-    # Otherwise, always serve index.html for React Router to handle the route
+    # Default to index.html for React Router (only if it exists)
     index_path = os.path.join(frontend_path, "index.html")
     if os.path.isfile(index_path):
         return FileResponse(index_path)
     
-    return {"status": "Frontend not found", "path_tried": index_path}
+    return {"error": "Frontend files missing", "tried_path": index_path}
