@@ -42,6 +42,11 @@ app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
 # Mount static files (React Frontend built files)
 frontend_path = os.path.join(os.path.dirname(__file__), "static")
 
+# Mount assets directory specifically
+assets_path = os.path.join(frontend_path, "assets")
+if os.path.isdir(assets_path):
+    app.mount("/assets", StaticFiles(directory=assets_path), name="assets")
+
 @app.get("/api/health")
 def health_check():
     return {"status": "ok"}
@@ -49,13 +54,18 @@ def health_check():
 # Catch-all route for React Router
 @app.get("/{full_path:path}")
 async def serve_react_app(full_path: str):
-    # Skip for API routes (though they should be handled by routers above)
+    # Skip for API routes
     if full_path.startswith("api/"):
         return {"detail": "Not Found"}
         
+    # Check if requested path is a file in static (like vite.svg, etc.)
+    file_path = os.path.join(frontend_path, full_path)
+    if os.path.isfile(file_path):
+        return FileResponse(file_path)
+        
+    # Default to index.html for React Router
     index_path = os.path.join(frontend_path, "index.html")
     if os.path.isfile(index_path):
         return FileResponse(index_path)
     
-    # Fallback if static files are not built yet
     return {"status": "Backend is running. Frontend static files not found in /static."}
