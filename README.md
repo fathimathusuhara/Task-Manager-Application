@@ -61,7 +61,7 @@ railway up
 ```
 
 ##  Project Structure
-- `backend/`: FastAPI application, ML models, and database schemas.
+- `backend/`: FastAPI application and database schemas.
 - `frontend/`: React application, assets, and styling.
 - `Dockerfile`: Multi-stage build for production.
 - `railway.json`: Deployment configuration.
