@@ -40,32 +40,35 @@ os.makedirs(uploads_path, exist_ok=True)
 app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
 
 # Mount static files (React Frontend built files)
-frontend_path = os.path.join(os.path.dirname(__file__), "static")
-
-# Mount assets directory specifically
-assets_path = os.path.join(frontend_path, "assets")
-if os.path.isdir(assets_path):
-    app.mount("/assets", StaticFiles(directory=assets_path), name="assets")
+# Get the absolute path to the static folder
+base_path = os.path.dirname(os.path.abspath(__file__))
+frontend_path = os.path.join(base_path, "static")
 
 @app.get("/api/health")
 def health_check():
     return {"status": "ok"}
 
-# Catch-all route for React Router
+# Mount uploads (high priority)
+uploads_path = os.path.join(base_path, "uploads")
+os.makedirs(uploads_path, exist_ok=True)
+app.mount("/uploads", StaticFiles(directory=uploads_path), name="uploads")
+
+# Mount assets specifically for JS/CSS
+assets_path = os.path.join(frontend_path, "assets")
+if os.path.exists(assets_path):
+    app.mount("/assets", StaticFiles(directory=assets_path), name="assets")
+
+# Catch-all route for React Router (MUST be after API routes)
 @app.get("/{full_path:path}")
 async def serve_react_app(full_path: str):
-    # Skip for API routes
-    if full_path.startswith("api/"):
-        return {"detail": "Not Found"}
-        
-    # Check if requested path is a file in static (like vite.svg, etc.)
+    # If the path exists as a physical file, serve it (e.g. favicon, images)
     file_path = os.path.join(frontend_path, full_path)
     if os.path.isfile(file_path):
         return FileResponse(file_path)
-        
-    # Default to index.html for React Router
+    
+    # Otherwise, always serve index.html for React Router to handle the route
     index_path = os.path.join(frontend_path, "index.html")
     if os.path.isfile(index_path):
         return FileResponse(index_path)
     
-    return {"status": "Backend is running. Frontend static files not found in /static."}
+    return {"status": "Frontend not found", "path_tried": index_path}
